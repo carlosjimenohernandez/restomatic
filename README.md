@@ -8,15 +8,44 @@ Automatic REST on top of Node.js + SQLite + Express.
 npm i -g @carlosjimenohernandez/restomatic
 ```
 
+## Features
+
+- REST operations:
+   - select: at `/api/v1/data/select`
+   - insert: at `/api/v1/data/insert?token=admin`
+   - update: at `/api/v1/data/update?token=admin`
+   - delete: at `/api/v1/data/delete?token=admin`
+- Static files: `/static/...`
+   - to load js, css, images, etc.
+- Dynamic templates: `/template/...`
+   - to load custom [`ejs`](https://github.com/mde/ejs)-rendered content.
+
+## Dependencies
+
+This is part of the `package.json`:
+
+```json
+  "dependencies": {
+    "better-sqlite3": "^12.2.0",
+    "body-parser": "^2.2.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "sqlstring": "^2.3.3"
+  }
+```
+
 ## Usage
 
 From command line you can:
 
 ```sh
 npx restomatic
-  --port 9090             # Port to listen
-  --models models.js      # Models to import
-  --database test.sqlite  # File for database
+  --port "9090"             # Port to listen
+  --models "models.js"      # Models to import
+  --routes "routes.js"      # Routes to include beside defaults
+  --token "admin"           # Token for advanced operations
+  --database "test.sqlite"  # File for database
 ```
 
 On `models.js` you must have something like:
@@ -34,17 +63,33 @@ module.exports = {
 };
 ```
 
+On `routes.js` you will want to have something like:
+
+```js
+Restomatic.router.use("/path", function(request, response) {
+    try {
+        return response.success({
+            message: "Your message",
+            note: "This method is injected by «XXX.create-application.js»'
+        });
+    } catch(error) {
+        return response.success(new Error("This method is injected by «XXX.create-application.js» too"));
+    }
+});
+```
+
 And a REST is set up for you automatically.
 
 ## Test
 
-Once running, you can insert:
+Once running, you can insert (**with** admin token):
 
 ```js
 const res = await fetch("http://127.0.0.1:9090/api/v1/data/insert", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
+        token: "admin", // This has to match with provided cmd token
         into: "individuals",
         values: [{
             nombre: "Carlos Jimeno Hernández",
@@ -61,13 +106,14 @@ const res = await fetch("http://127.0.0.1:9090/api/v1/data/insert", {
 console.log(await res.json());
 ```
 
-You can select:
+You can select (**without** admin token):
 
 ```js
 const res = await fetch("http://127.0.0.1:9090/api/v1/data/select", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
+        token: "none", // This is not required for select operations
         from: "individuals",
         where: [
             ["id", "is not null"],
@@ -89,13 +135,14 @@ const res = await fetch("http://127.0.0.1:9090/api/v1/data/select", {
 console.log(await res.json());
 ```
 
-You can update:
+You can update (**with** admin token):
 
 ```js
 const res = await fetch("http://127.0.0.1:9090/api/v1/data/select", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
+        token: "admin", // This has to match with provided cmd token
         from: "individuals",
         set: {
             tipo: "Familiar"
@@ -117,13 +164,14 @@ const res = await fetch("http://127.0.0.1:9090/api/v1/data/select", {
 console.log(await res.json());
 ```
 
-You can delete:
+You can delete (**with** admin token):
 
 ```js
 const res = await fetch("http://127.0.0.1:9090/api/v1/data/delete", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
+        token: "admin", // This has to match with provided cmd token
         from: "individuals",
         where: [
             ["id", "is null"],
@@ -141,33 +189,4 @@ const res = await fetch("http://127.0.0.1:9090/api/v1/data/delete", {
 });
 console.log(await res.json());
 ```
-
-## Features
-
-There is a builder that groups all the code in 1 javascript file (`restomatic.js`) which is the one executed by the command line.
-
-It is not though to work as API because:
-
-> The parameters are always taken from `process.argv`.
-
-Also, take into account that:
-
-> No auth. No permissions system. No magic tokens. This is an unusable REST API that can make the job from internal networks. This is not usable for public projects where anyone can flood your database with one simple loop.
-
-But.
-
-> In non-hostile environments, like internal scraps or fast demos, you can use it to do the job.
-
-Also, note that:
-
-> It is a good starting point for:
->
-> - an authentication and authorization system
->    - with groups
->    - with users
->    - with permissions
-> - a template-driven page builder
-> - more complex systems
-
-But, as it own, it is only a simple REST that is automatically set up around SQLite database.
 

@@ -1,5 +1,6 @@
 Restomatic.controllers.api.v1.data.insert = async function(request, response) {
   try {
+    Restomatic.utils.protectWithAdminToken("insert", request.body?.token || request.query.token || false);
     const into = request.body?.into || request.query.into || false;
     const values = request.body?.values || request.query.values || false;
     const sanitizedInsert = Restomatic.utils.buildSqlInsert({

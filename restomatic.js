@@ -42,7 +42,14 @@ Restomatic.utils.escapeValue = function(text) {
   return require("sqlstring").escape(text);
 };
 
-// @file[4] = src/utils/buildSqlCreateTable.js
+// @file[4] = src/utils/protectWithAdminToken.js
+
+Restomatic.utils.protectWithAdminToken = function(operationId, token = false) {
+  Restomatic.utils.assertAs(`Operation «${operationId}» requires administration token`).that(typeof token === "string");
+  Restomatic.utils.assertAs(`Operation «${operationId}» could not match administration token with provided «${token}»`).that(token === Restomatic.parameters.token);
+};
+
+// @file[5] = src/utils/buildSqlCreateTable.js
 
 Restomatic.utils.buildSqlCreateTable = function(modelId, modelMetadata) {
   const modelIdSanitized = Restomatic.utils.escapeId(modelId);
@@ -60,7 +67,7 @@ Restomatic.utils.buildSqlCreateTable = function(modelId, modelMetadata) {
   return sql;
 };
 
-// @file[5] = src/utils/buildSqlWhere.js
+// @file[6] = src/utils/buildSqlWhere.js
 
 (function () {
 
@@ -130,7 +137,7 @@ Restomatic.utils.buildSqlCreateTable = function(modelId, modelMetadata) {
   };
 })();
 
-// @file[6] = src/utils/buildSqlSelect.js
+// @file[7] = src/utils/buildSqlSelect.js
 
 Restomatic.utils.buildSqlSelect = function(parameters) {
   const { from, where, order, page, items } = parameters;
@@ -176,7 +183,7 @@ Restomatic.utils.buildSqlSelect = function(parameters) {
   return sql;
 };
 
-// @file[7] = src/utils/buildSqlInsert.js
+// @file[8] = src/utils/buildSqlInsert.js
 
 Restomatic.utils.buildSqlInsert = function(parameters) {
   let { into, values = "{}" } = parameters;
@@ -208,7 +215,7 @@ Restomatic.utils.buildSqlInsert = function(parameters) {
   return sql;
 };
 
-// @file[8] = src/utils/buildSqlUpdate.js
+// @file[9] = src/utils/buildSqlUpdate.js
 
 Restomatic.utils.buildSqlUpdate = function(parameters) {
   const { from, where, set } = parameters;
@@ -242,7 +249,7 @@ Restomatic.utils.buildSqlUpdate = function(parameters) {
   return sql;
 };
 
-// @file[9] = src/utils/buildSqlDelete.js
+// @file[10] = src/utils/buildSqlDelete.js
 
 Restomatic.utils.buildSqlDelete = function(parameters) {
   const { from, where } = parameters;
@@ -257,7 +264,7 @@ Restomatic.utils.buildSqlDelete = function(parameters) {
   return sql;
 };
 
-// @file[10] = src/utils/executeSql.js
+// @file[11] = src/utils/executeSql.js
 
 Restomatic.utils.executeSql = function(code, args = {}) {
   console.log("[SQL] " + code);
@@ -268,7 +275,7 @@ Restomatic.utils.executeSql = function(code, args = {}) {
   }
 };
 
-// @file[11] = src/controllers/api/v1/data/schema.js
+// @file[12] = src/controllers/api/v1/data/schema.js
 
 Restomatic.controllers.api.v1.data.schema = function(request, response) {
   try {
@@ -282,7 +289,7 @@ Restomatic.controllers.api.v1.data.schema = function(request, response) {
   }
 };
 
-// @file[12] = src/controllers/api/v1/data/select.js
+// @file[13] = src/controllers/api/v1/data/select.js
 
 Restomatic.controllers.api.v1.data.select = async function(request, response) {
   try {
@@ -310,10 +317,11 @@ Restomatic.controllers.api.v1.data.select = async function(request, response) {
   }
 };
 
-// @file[13] = src/controllers/api/v1/data/insert.js
+// @file[14] = src/controllers/api/v1/data/insert.js
 
 Restomatic.controllers.api.v1.data.insert = async function(request, response) {
   try {
+    Restomatic.utils.protectWithAdminToken("insert", request.body?.token || request.query.token || false);
     const into = request.body?.into || request.query.into || false;
     const values = request.body?.values || request.query.values || false;
     const sanitizedInsert = Restomatic.utils.buildSqlInsert({
@@ -330,10 +338,11 @@ Restomatic.controllers.api.v1.data.insert = async function(request, response) {
   }
 };
 
-// @file[14] = src/controllers/api/v1/data/update.js
+// @file[15] = src/controllers/api/v1/data/update.js
 
 Restomatic.controllers.api.v1.data.update = async function(request, response) {
   try {
+    Restomatic.utils.protectWithAdminToken("update", request.body?.token || request.query.token || false);
     const set = request.body?.set || request.query.set || false;
     const from = request.body?.from || request.query.from || false;
     const where = request.body?.where || request.query.where || false;
@@ -352,10 +361,11 @@ Restomatic.controllers.api.v1.data.update = async function(request, response) {
   }
 };
 
-// @file[15] = src/controllers/api/v1/data/delete.js
+// @file[16] = src/controllers/api/v1/data/delete.js
 
 Restomatic.controllers.api.v1.data.delete = async function(request, response) {
   try {
+    Restomatic.utils.protectWithAdminToken("delete", request.body?.token || request.query.token || false);
     const from = request.body?.from || request.query.from || false;
     const where = request.body?.where || request.query.where || false;
     const sanitizedDelete = Restomatic.utils.buildSqlDelete({
@@ -372,7 +382,7 @@ Restomatic.controllers.api.v1.data.delete = async function(request, response) {
   }
 };
 
-// @file[16] = src/main/002.get-parameters.js
+// @file[17] = src/main/002.get-parameters.js
 
 // Get parameters
 Extract_process_parameters: {
@@ -396,25 +406,47 @@ Extract_process_parameters: {
     return output;
   }, {});
 
+  // Parameter database:
   if (!Restomatic.parameters.database) {
     Restomatic.parameters.database = "default.sqlite";
   }
 
+  // Parameter port:
   if (!Restomatic.parameters.port) {
     Restomatic.parameters.port = "9090";
   }
 
+  // Parameter models:
   if (!Restomatic.parameters.models) {
     Restomatic.parameters.models = require("path").resolve(process.cwd(), "models.js");
   }
 
+  // Parameter routes:
   if (!Restomatic.parameters.routes) {
     Restomatic.parameters.routes = require("path").resolve(process.cwd(), "routes.js");
+  } else {
+    Restomatic.parameters.routes = require("path").resolve(process.cwd(), Restomatic.parameters.routes);
+  }
+
+  // Parameter routesCallback:
+  if (Restomatic.parameters.routes) {
+    try {
+      Restomatic.parameters.routesCallback = require(Restomatic.parameters.routes);
+    } catch (error) {
+      Restomatic.parameters.routesCallback = function() {
+        console.log("[WARN] Routes will not be loaded due to " + error.name + ": " + error.message);
+      };
+    }
+  }
+
+  // Parameter token:
+  if (!Restomatic.parameters.token) {
+    Restomatic.parameters.token = false;
   }
 
 }
 
-// @file[17] = src/main/003.create-database.js
+// @file[18] = src/main/003.create-database.js
 
 // Create database
 Create_database: {
@@ -426,7 +458,7 @@ Create_database: {
 
 }
 
-// @file[18] = src/main/004.create-application.js
+// @file[19] = src/main/004.create-application.js
 
 // Create application
 Create_application: {
@@ -457,7 +489,7 @@ Create_application: {
 
 }
 
-// @file[19] = src/main/005.create-server.js
+// @file[20] = src/main/005.create-server.js
 
 // Create server
 Create_server: {
@@ -468,7 +500,7 @@ Create_server: {
 
 }
 
-// @file[20] = src/main/010.add-rest-routes.js
+// @file[21] = src/main/010.add-rest-routes.js
 
 // Add rest routes
 Add_rest_routes: {
@@ -480,9 +512,33 @@ Add_rest_routes: {
   Restomatic.router.use("/api/v1/data/update", Restomatic.controllers.api.v1.data.update);
   Restomatic.router.use("/api/v1/data/delete", Restomatic.controllers.api.v1.data.delete);
 
+  Restomatic.router.use("/static", require("express").static(__dirname + "/src/static"));
+  Restomatic.router.use("/template", async function(request, response, next) {
+    try {
+      console.log()
+      const filepath = __dirname + "/src/template" + request.path;
+      console.log("Looking for: " + filepath);
+      const filecontent = await require("fs").promises.readFile(filepath, "utf8");
+      const rendered = await require("ejs").render(filecontent, { request, response }, { async: true });
+      return response.send(rendered);
+    } catch (error) {
+      console.log(error);
+      if (error.code === "ENOENT") {
+        return next();
+      } else {
+        console.log(error);
+        return response.fail(error);
+      }
+    }
+  });
+  
+  if(typeof Restomatic.parameters.routesCallback === "function") {
+    Restomatic.parameters.routesCallback();
+  }
+
 }
 
-// @file[21] = src/main/011.add-rest-models.js
+// @file[22] = src/main/011.add-rest-models.js
 
 // Add rest models
 Add_rest_models: {
@@ -514,7 +570,7 @@ Add_rest_models: {
 
 }
 
-// @file[22] = src/main/900.start-server.js
+// @file[23] = src/main/900.start-server.js
 
 // Start server
 Start_server: {
@@ -525,7 +581,7 @@ Start_server: {
 
 }
 
-// @file[23] = src/main/999.test.js
+// @file[24] = src/main/999.test.js
 
 console.log(Object.keys(Restomatic));
 

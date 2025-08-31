@@ -1,5 +1,6 @@
 Restomatic.controllers.api.v1.data.update = async function(request, response) {
   try {
+    Restomatic.utils.protectWithAdminToken("update", request.body?.token || request.query.token || false);
     const set = request.body?.set || request.query.set || false;
     const from = request.body?.from || request.query.from || false;
     const where = request.body?.where || request.query.where || false;

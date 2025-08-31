@@ -3,6 +3,7 @@ module.exports = [
   "src/utils/assertAs.js",
   "src/utils/escapeId.js",
   "src/utils/escapeValue.js",
+  "src/utils/protectWithAdminToken.js",
   "src/utils/buildSqlCreateTable.js",
   "src/utils/buildSqlWhere.js",
   "src/utils/buildSqlSelect.js",

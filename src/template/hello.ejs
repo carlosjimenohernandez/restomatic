@@ -1,0 +1,17 @@
+<% response.type("html") %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello to user</title>
+</head>
+<body>
+    <h3>Hello to the user</h3>
+    <p>Hello, <%- request.query.user || "user" %>!</p>
+    <% if(!request.query.user) { %>
+    <p>Provide <b>?user=Your name</b> to see a custom message rendered on the server!</p>
+    <% } %>
+</body>
+</html>
