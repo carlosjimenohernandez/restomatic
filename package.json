@@ -1,0 +1,24 @@
+{
+  "name": "@carlosjimenohernandez/restomatic",
+  "version": "1.0.0",
+  "description": "Set up REST automatically",
+  "main": "restomatic.js",
+  "bin": {
+    "restomatic": "restomatic.js"
+  },
+  "scripts": {
+    "dev": "npx nodemon -w src -e 'js' -x 'node build.js'",
+    "build": "node build.js",
+    "test": "echo 'no test yet'"
+  },
+  "keywords": [],
+  "author": "carlosjimenohernandez",
+  "license": "WTFPL",
+  "dependencies": {
+    "better-sqlite3": "^12.2.0",
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "sqlstring": "^2.3.3"
+  }
+}

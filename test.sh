@@ -1,0 +1,1 @@
+node restomatic --port 9090 --database test.sqlite --models test/models.js
