@@ -19,6 +19,7 @@ npm i -g @carlosjimenohernandez/restomatic
    - createColumn: at `/api/v1/data/createColumn?token=admin`
    - removeTable: at `/api/v1/data/removeTable?token=admin`
    - removeColumn: at `/api/v1/data/removeColumn?token=admin`
+   - setFile: at `/api/v1/data/setFile?token=admin`
 - Static files: `/static/...`
    - to load js, css, images, etc.
 - Dynamic templates: `/template/...`
@@ -210,6 +211,10 @@ Also, you can alter the schema by the following operations:
         - with the name of the table
      - Parameter `column`: **String**
         - with the name of the column
+  - **Set file** at `/api/v1/data/setFile`
+     - This operation requires `multipart/form-data` (see [`test/run.js`](./test/run.js))
+     - Parameter `file`: **Blob**
+        - with the contents of the file
 
 ### Select data
 
@@ -408,6 +413,7 @@ Below are listed other features the tool offers automatically.
 
   - Static content
   - Dynamic content
+  - Upload files
 
 ### Static content
 
@@ -436,3 +442,28 @@ You can use this snippet to force some mime-type when rendering and serving a fi
 <% response.type("js") %>
 ```
 
+### Upload files
+
+Only admin can upload files, as it is a potentially conflictive behaviour.
+
+The example run on `test/run.js` demonstrates how this can work without downloading libraries in node.js:
+
+```js
+const fs = require("fs");
+const form = new FormData();
+const fileBuffer = fs.readFileSync(__dirname + "/example.txt");
+
+form.append("file", new Blob([fileBuffer]), "example.txt");
+
+const r = await fetch("http://127.0.0.1:9090/api/v1/data/setFile", {
+    method: "POST",
+    body: form,
+    headers: {
+        token: "admin"
+    }
+});
+
+const response = await r.text();
+
+console.log(response);
+```

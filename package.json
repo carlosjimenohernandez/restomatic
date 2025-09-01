@@ -21,9 +21,5 @@
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "sqlstring": "^2.3.3"
-  },
-  "devDependencies": {
-    "form-data": "^4.0.4",
-    "node-fetch": "^3.3.2"
   }
 }
