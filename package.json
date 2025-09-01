@@ -4,7 +4,7 @@
   "description": "Set up REST automatically",
   "main": "restomatic.js",
   "bin": {
-    "restomatic": "restomatic.js"
+    "restomatic": "restomatic.bin.js"
   },
   "scripts": {
     "dev": "npx nodemon -w src -e 'js' -x 'node build.js'",
@@ -21,5 +21,9 @@
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "sqlstring": "^2.3.3"
+  },
+  "devDependencies": {
+    "form-data": "^4.0.4",
+    "node-fetch": "^3.3.2"
   }
 }

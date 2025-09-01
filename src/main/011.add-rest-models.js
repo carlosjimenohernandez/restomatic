@@ -21,7 +21,11 @@ Add_rest_models: {
       const createTableSql = Restomatic.utils.buildSqlCreateTable(modelId, modelMetadata);
       const result = Restomatic.utils.executeSql(createTableSql);
     } catch (error) {
-      console.log(error);
+      if((error.name === "SqliteError") && (error.message.endsWith("already exists"))) {
+        console.log(`[*] Table «${modelId}» already exists in the database`);
+      } else {
+        throw error;
+      }
     }
     
   }

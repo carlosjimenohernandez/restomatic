@@ -14,7 +14,7 @@ Restomatic.controllers.api.v1.data.select = async function(request, response) {
       page,
       items,
     });
-    const output = Restomatic.utils.executeSql(sanitizedSelect);
+    const output = Restomatic.utils.querySql(sanitizedSelect);
     return response.success({
       operation: "api/v1/data/select",
       output,

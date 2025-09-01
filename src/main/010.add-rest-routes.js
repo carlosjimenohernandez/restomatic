@@ -7,6 +7,12 @@ Add_rest_routes: {
   Restomatic.router.use("/api/v1/data/insert", Restomatic.controllers.api.v1.data.insert);
   Restomatic.router.use("/api/v1/data/update", Restomatic.controllers.api.v1.data.update);
   Restomatic.router.use("/api/v1/data/delete", Restomatic.controllers.api.v1.data.delete);
+
+  Restomatic.router.use("/api/v1/data/createTable", Restomatic.controllers.api.v1.data.createTable);
+  Restomatic.router.use("/api/v1/data/createColumn", Restomatic.controllers.api.v1.data.createColumn);
+  Restomatic.router.use("/api/v1/data/removeTable", Restomatic.controllers.api.v1.data.removeTable);
+  Restomatic.router.use("/api/v1/data/removeColumn", Restomatic.controllers.api.v1.data.removeColumn);
+  Restomatic.router.post("/api/v1/data/setFile", Restomatic.controllers.api.v1.data.setFile);
   
   // Inject routes to override other routes:
   if(typeof Restomatic.parameters.routesCallback === "function") {
@@ -19,7 +25,11 @@ Add_rest_routes: {
       console.log()
       const filepath = __dirname + "/src/template" + request.path;
       const filecontent = await require("fs").promises.readFile(filepath, "utf8");
-      const rendered = await require("ejs").render(filecontent, { request, response }, { async: true });
+      const rendered = await require("ejs").render(filecontent, {
+        Restomatic,
+        request,
+        response
+      }, { async: true });
       return response.send(rendered);
     } catch (error) {
       console.log(error);
@@ -31,5 +41,6 @@ Add_rest_routes: {
       }
     }
   });
+
 
 }

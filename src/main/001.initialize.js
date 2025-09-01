@@ -1,5 +1,5 @@
 // Initialize
-global.Restomatic = {
+const Restomatic = {
   utils: {},
   controllers: {
     api: {

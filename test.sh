@@ -1,1 +1,1 @@
-node restomatic --port 9090 --database test.sqlite --models test/models.js --token admin
+node restomatic.bin.js --port 9090 --database test.sqlite --models test/models.js --token admin
