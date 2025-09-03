@@ -1,6 +1,6 @@
 {
   "name": "@carlosjimenohernandez/restomatic",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Set up REST automatically",
   "main": "restomatic.js",
   "bin": {
