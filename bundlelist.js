@@ -28,6 +28,7 @@ module.exports = [
   "src/controllers/api/v1/data/createColumn.js",
   "src/controllers/api/v1/data/removeTable.js",
   "src/controllers/api/v1/data/removeColumn.js",
+  "src/controllers/api/v1/data/listFiles.js",
   "src/controllers/api/v1/data/setFile.js",
   "src/main/002.get-parameters.js",
   "src/main/003.create-database.js",

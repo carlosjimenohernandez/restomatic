@@ -12,6 +12,7 @@ Add_rest_routes: {
   Restomatic.router.use("/api/v1/data/createColumn", Restomatic.controllers.api.v1.data.createColumn);
   Restomatic.router.use("/api/v1/data/removeTable", Restomatic.controllers.api.v1.data.removeTable);
   Restomatic.router.use("/api/v1/data/removeColumn", Restomatic.controllers.api.v1.data.removeColumn);
+  Restomatic.router.use("/api/v1/data/listFiles", Restomatic.controllers.api.v1.data.listFiles);
   Restomatic.router.post("/api/v1/data/setFile", Restomatic.controllers.api.v1.data.setFile);
   
   // Inject routes to override other routes:

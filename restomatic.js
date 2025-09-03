@@ -573,7 +573,16 @@ const RestomaticAPI = {
       }
     };
 
-    // @file[29] = src/controllers/api/v1/data/setFile.js
+    // @file[29] = src/controllers/api/v1/data/listFiles.js
+
+    Restomatic.controllers.api.v1.data.listFiles = async function(request, response) {
+      const files = await require("fs").promises.readdir(__dirname + "/src/static/uploads/");
+      return response.success({
+        output: files
+      });
+    };
+
+    // @file[30] = src/controllers/api/v1/data/setFile.js
 
     (function() {
 
@@ -616,12 +625,12 @@ const RestomaticAPI = {
 
     })();
 
-    // @file[30] = src/main/002.get-parameters.js
+    // @file[31] = src/main/002.get-parameters.js
 
     // Get parameters
     Restomatic.parameters = options;
 
-    // @file[31] = src/main/003.create-database.js
+    // @file[32] = src/main/003.create-database.js
 
     // Create database
     Create_database: {
@@ -633,7 +642,7 @@ const RestomaticAPI = {
 
     }
 
-    // @file[32] = src/main/004.create-application.js
+    // @file[33] = src/main/004.create-application.js
 
     // Create application
     Create_application: {
@@ -664,7 +673,7 @@ const RestomaticAPI = {
 
     }
 
-    // @file[33] = src/main/005.create-server.js
+    // @file[34] = src/main/005.create-server.js
 
     // Create server
     Create_server: {
@@ -675,7 +684,7 @@ const RestomaticAPI = {
 
     }
 
-    // @file[34] = src/main/010.add-rest-routes.js
+    // @file[35] = src/main/010.add-rest-routes.js
 
     // Add rest routes
     Add_rest_routes: {
@@ -691,6 +700,7 @@ const RestomaticAPI = {
       Restomatic.router.use("/api/v1/data/createColumn", Restomatic.controllers.api.v1.data.createColumn);
       Restomatic.router.use("/api/v1/data/removeTable", Restomatic.controllers.api.v1.data.removeTable);
       Restomatic.router.use("/api/v1/data/removeColumn", Restomatic.controllers.api.v1.data.removeColumn);
+      Restomatic.router.use("/api/v1/data/listFiles", Restomatic.controllers.api.v1.data.listFiles);
       Restomatic.router.post("/api/v1/data/setFile", Restomatic.controllers.api.v1.data.setFile);
 
       // Inject routes to override other routes:
@@ -726,7 +736,7 @@ const RestomaticAPI = {
 
     }
 
-    // @file[35] = src/main/011.add-rest-models.js
+    // @file[36] = src/main/011.add-rest-models.js
 
     // Add rest models
     Add_rest_models: {
@@ -762,18 +772,19 @@ const RestomaticAPI = {
 
     }
 
-    // @file[36] = src/main/900.start-server.js
+    // @file[37] = src/main/900.start-server.js
 
     // Start server
     Start_server: {
 
       Restomatic.server.listen(Restomatic.parameters.port, function() {
-        console.log(`[*] Restomatic server started at port: ${Restomatic.parameters.port}`);
+        console.log(`[*] Restomatic server started at:`);
+        console.log(`  - http://127.0.0.1:${Restomatic.parameters.port}`);
       });
 
     }
 
-    // @file[37] = src/main/999.close-function.js
+    // @file[38] = src/main/999.close-function.js
 
     return Restomatic;
   }
