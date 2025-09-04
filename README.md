@@ -98,12 +98,19 @@ The `token` parameter is used to filter advanced operations that require permiss
   - `/api/v1/data/insert`
   - `/api/v1/data/update`
   - `/api/v1/data/delete`
-  - `/api/v1/data/create-table`
-  - `/api/v1/data/create-column`
-  - `/api/v1/data/remove-table`
-  - `/api/v1/data/remove-column`
+  - `/api/v1/data/createTable`
+  - `/api/v1/data/createColumn`
+  - `/api/v1/data/removeTable`
+  - `/api/v1/data/removeColumn`
+  - `/api/v1/filesystem/makeDirectory`
+  - `/api/v1/filesystem/readDirectory`
+  - `/api/v1/filesystem/deleteDirectory`
+  - `/api/v1/filesystem/writeFile`
+  - `/api/v1/filesystem/readFile`
+  - `/api/v1/filesystem/deleteFile`
+  - `/api/v1/filesystem/isFile`
 
-You have to provide directly the string that can match the `token` parameter on the request, either by, in his order:
+You have to provide directly the string that can match the `token` parameter on the request, either by, in this order:
   - `request.headers.token`
   - `request.body.token`
   - `request.query.token`
