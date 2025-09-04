@@ -488,19 +488,122 @@ const response = await r.text();
 console.log(response);
 ```
 
-### Filesystem operations
+## Filesystem operations
 
-Only admin can access and modify files through the filesystem API, as it is a potentially conflictive behaviour.
+Only admin can commit filesystem operations, as they have potentially conflictive behaviours.
 
-The above operations describe an example of every possible **Filesystem API** operation:
+### Make directory
 
-- http://127.0.0.1:9090/api/v1/filesystem/makeDirectory?token=admin&path=/static/newdir
-- http://127.0.0.1:9090/api/v1/filesystem/readDirectory?token=admin&path=/static
-- http://127.0.0.1:9090/api/v1/filesystem/deleteDirectory?token=admin&path=/static/newdir
-- http://127.0.0.1:9090/api/v1/filesystem/writeFile?token=admin&path=/static/newdir/file1.txt&content=Hello!
-- http://127.0.0.1:9090/api/v1/filesystem/readFile?token=admin&path=/static/newdir/file1.txt
-- http://127.0.0.1:9090/api/v1/filesystem/deleteFile?token=admin&path=/static/newdir/file1.txt
-- http://127.0.0.1:9090/api/v1/filesystem/isFile?token=admin&path=/static/jquery.js
+For example:
+
+```js
+const res = await fetch("http://127.0.0.1:9090/api/v1/filesystem/makeDirectory", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+        token: "admin", // This has to match with provided cmd token
+        path: "/static/newdir", // This has to start with /static or /template
+    })
+});
+console.log(await res.json());
+```
+
+### Read directory
+
+For example:
+
+```js
+const res = await fetch("http://127.0.0.1:9090/api/v1/filesystem/readDirectory", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+        token: "admin", // This has to match with provided cmd token
+        path: "/static/newdir", // This has to start with /static or /template
+    })
+});
+console.log(await res.json());
+```
+
+### Delete directory
+
+For example:
+
+```js
+const res = await fetch("http://127.0.0.1:9090/api/v1/filesystem/deleteDirectory", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+        token: "admin", // This has to match with provided cmd token
+        path: "/static/newdir", // This has to start with /static or /template
+    })
+});
+console.log(await res.json());
+```
+
+### Write file
+
+For example:
+
+```js
+const res = await fetch("http://127.0.0.1:9090/api/v1/filesystem/writeFile", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+        token: "admin", // This has to match with provided cmd token
+        path: "/static/newdir/file1.txt", // This has to start with /static or /template
+        content: "Hello!", 
+    })
+});
+console.log(await res.json());
+```
+
+### Read file
+
+For example:
+
+```js
+const res = await fetch("http://127.0.0.1:9090/api/v1/filesystem/readFile", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+        token: "admin", // This has to match with provided cmd token
+        path: "/static/newdir/file1.txt", // This has to start with /static or /template
+    })
+});
+console.log(await res.json());
+```
+
+### Delete file
+
+For example:
+
+```js
+const res = await fetch("http://127.0.0.1:9090/api/v1/filesystem/deleteFile", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+        token: "admin", // This has to match with provided cmd token
+        path: "/static/newdir/file1.txt", // This has to start with /static or /template
+    })
+});
+console.log(await res.json());
+```
+
+### Is file?
+
+For example:
+
+```js
+const res = await fetch("http://127.0.0.1:9090/api/v1/filesystem/isFile", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+        token: "admin", // This has to match with provided cmd token
+        path: "/static/jquery.js", // This has to start with /static or /template
+    })
+});
+console.log(await res.json());
+```
 
 ## Customize by your own
 
