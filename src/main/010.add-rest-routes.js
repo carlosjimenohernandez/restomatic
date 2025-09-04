@@ -15,6 +15,14 @@ Add_rest_routes: {
   Restomatic.router.use("/api/v1/data/listFiles", Restomatic.controllers.api.v1.data.listFiles);
   Restomatic.router.post("/api/v1/data/setFile", Restomatic.controllers.api.v1.data.setFile);
   
+  Restomatic.router.use("/api/v1/filesystem/readDirectory", Restomatic.controllers.api.v1.filesystem.readDirectory);
+  Restomatic.router.use("/api/v1/filesystem/makeDirectory", Restomatic.controllers.api.v1.filesystem.makeDirectory);
+  Restomatic.router.use("/api/v1/filesystem/deleteDirectory", Restomatic.controllers.api.v1.filesystem.deleteDirectory);
+  Restomatic.router.use("/api/v1/filesystem/readFile", Restomatic.controllers.api.v1.filesystem.readFile);
+  Restomatic.router.use("/api/v1/filesystem/writeFile", Restomatic.controllers.api.v1.filesystem.writeFile);
+  Restomatic.router.use("/api/v1/filesystem/deleteFile", Restomatic.controllers.api.v1.filesystem.deleteFile);
+  Restomatic.router.use("/api/v1/filesystem/isFile", Restomatic.controllers.api.v1.filesystem.isFile);
+
   // Inject routes to override other routes:
   if(typeof Restomatic.parameters.routesCallback === "function") {
     Restomatic.parameters.routesCallback();

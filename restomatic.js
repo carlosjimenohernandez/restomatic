@@ -13,7 +13,10 @@ const RestomaticAPI = {
           v1: {
             data: {
               // @OK
-            }
+            },
+            filesystem: {
+              // @OK
+            },
           }
         }
       },
@@ -440,7 +443,7 @@ const RestomaticAPI = {
 
     Restomatic.controllers.api.v1.data.insert = async function(request, response) {
       try {
-        Restomatic.utils.protectWithAdminToken("insert", request.headers.token || request.body?.token || request.query.token || false);
+        Restomatic.utils.protectWithAdminToken("api/v1/data/insert", request.headers.token || request.body?.token || request.query.token || false);
         const into = request.body?.into || request.query.into || false;
         const values = request.body?.values || request.query.values || false;
         const sanitizedInsert = Restomatic.utils.buildSqlInsert({
@@ -461,7 +464,7 @@ const RestomaticAPI = {
 
     Restomatic.controllers.api.v1.data.update = async function(request, response) {
       try {
-        Restomatic.utils.protectWithAdminToken("update", request.headers.token || request.body?.token || request.query.token || false);
+        Restomatic.utils.protectWithAdminToken("api/v1/data/update", request.headers.token || request.body?.token || request.query.token || false);
         const set = request.body?.set || request.query.set || false;
         const from = request.body?.from || request.query.from || false;
         const where = request.body?.where || request.query.where || false;
@@ -484,7 +487,7 @@ const RestomaticAPI = {
 
     Restomatic.controllers.api.v1.data.delete = async function(request, response) {
       try {
-        Restomatic.utils.protectWithAdminToken("delete", request.headers.token || request.body?.token || request.query.token || false);
+        Restomatic.utils.protectWithAdminToken("api/v1/data/delete", request.headers.token || request.body?.token || request.query.token || false);
         const from = request.body?.from || request.query.from || false;
         const where = request.body?.where || request.query.where || false;
         const sanitizedDelete = Restomatic.utils.buildSqlDelete({
@@ -505,7 +508,7 @@ const RestomaticAPI = {
 
     Restomatic.controllers.api.v1.data.createTable = async function(request, response) {
       try {
-        Restomatic.utils.protectWithAdminToken("createTable", request.headers.token || request.body?.token || request.query.token || false);
+        Restomatic.utils.protectWithAdminToken("api/v1/data/createTable", request.headers.token || request.body?.token || request.query.token || false);
         const table = request.body?.table || request.query.table || false;
         const content = request.body?.content || request.query.content || false;
         const sanitizedCreateTable = Restomatic.utils.buildSqlCreateTable(table, content);
@@ -523,7 +526,7 @@ const RestomaticAPI = {
 
     Restomatic.controllers.api.v1.data.createColumn = async function(request, response) {
       try {
-        Restomatic.utils.protectWithAdminToken("createColumn", request.headers.token || request.body?.token || request.query.token || false);
+        Restomatic.utils.protectWithAdminToken("api/v1/data/createColumn", request.headers.token || request.body?.token || request.query.token || false);
         const table = request.body?.table || request.query.table || false;
         const column = request.body?.column || request.query.column || false;
         const content = request.body?.content || request.query.content || false;
@@ -542,7 +545,7 @@ const RestomaticAPI = {
 
     Restomatic.controllers.api.v1.data.removeTable = async function(request, response) {
       try {
-        Restomatic.utils.protectWithAdminToken("removeTable", request.headers.token || request.body?.token || request.query.token || false);
+        Restomatic.utils.protectWithAdminToken("api/v1/data/removeTable", request.headers.token || request.body?.token || request.query.token || false);
         const table = request.body?.table || request.query.table || false;
         const sanitizedRemoveTable = Restomatic.utils.buildSqlRemoveTable(table);
         const output = Restomatic.utils.executeSql(sanitizedRemoveTable);
@@ -559,7 +562,7 @@ const RestomaticAPI = {
 
     Restomatic.controllers.api.v1.data.removeColumn = async function(request, response) {
       try {
-        Restomatic.utils.protectWithAdminToken("removeColumn", request.headers.token || request.body?.token || request.query.token || false);
+        Restomatic.utils.protectWithAdminToken("api/v1/data/removeColumn", request.headers.token || request.body?.token || request.query.token || false);
         const table = request.body?.table || request.query.table || false;
         const column = request.body?.column || request.query.column || false;
         const sanitizedRemoveColumn = Restomatic.utils.buildSqlRemoveColumn(table, column);
@@ -603,7 +606,7 @@ const RestomaticAPI = {
         storage,
         fileFilter: function(request, file, done) {
           try {
-            Restomatic.utils.protectWithAdminToken("setFile", request.headers.token || request.body?.token || request.query.token || false);
+            Restomatic.utils.protectWithAdminToken("api/v1/data/setFile", request.headers.token || request.body?.token || request.query.token || false);
             done(null, true);
           } catch (error) {
             done(error, false);
@@ -625,12 +628,177 @@ const RestomaticAPI = {
 
     })();
 
-    // @file[31] = src/main/002.get-parameters.js
+    // @file[31] = src/controllers/api/v1/filesystem/readDirectory.js
+
+    Restomatic.controllers.api.v1.filesystem.readDirectory = async function(request, response) {
+      try {
+        Restomatic.utils.protectWithAdminToken("api/v1/filesystem/readDirectory", request.headers.token || request.body?.token || request.query.token || false);
+        const dirpath = request.body?.path || request.query.path || false;
+        const isValid = dirpath.startsWith("/static") || dirpath.startsWith("/template");
+        if (!isValid) {
+          throw new Error("Parameter «path» must start with either «/static» or «/template» to be valid to «readDirectory»");
+        }
+        const dirpathSanitized = require("path").resolve(__dirname + "/src" + dirpath);
+        const output = await require("fs").promises.readdir(dirpathSanitized);
+        return response.success({
+          operation: "api/v1/filesystem/readDirectory",
+          output,
+        });
+      } catch (error) {
+        return response.fail(error);
+      }
+    };
+
+    // @file[32] = src/controllers/api/v1/filesystem/makeDirectory.js
+
+    Restomatic.controllers.api.v1.filesystem.makeDirectory = async function(request, response) {
+      try {
+        Restomatic.utils.protectWithAdminToken("api/v1/filesystem/makeDirectory", request.headers.token || request.body?.token || request.query.token || false);
+        const dirpath = request.body?.path || request.query.path || false;
+        const isValid = dirpath.startsWith("/static") || dirpath.startsWith("/template");
+        if (!isValid) {
+          throw new Error("Parameter «path» must start with either «/static» or «/template» to be valid to «makeDirectory»");
+        }
+        const dirpathSanitized = require("path").resolve(__dirname + "/src" + dirpath);
+        await require("fs").promises.mkdir(dirpathSanitized);
+        return response.success({
+          operation: "api/v1/filesystem/makeDirectory",
+          output: {
+            newDirectory: dirpathSanitized
+          }
+        });
+      } catch (error) {
+        return response.fail(error);
+      }
+    };
+
+    // @file[33] = src/controllers/api/v1/filesystem/deleteDirectory.js
+
+    Restomatic.controllers.api.v1.filesystem.deleteDirectory = async function(request, response) {
+      try {
+        Restomatic.utils.protectWithAdminToken("api/v1/filesystem/deleteDirectory", request.headers.token || request.body?.token || request.query.token || false);
+        const dirpath = request.body?.path || request.query.path || false;
+        const isValid = dirpath.startsWith("/static") || dirpath.startsWith("/template");
+        if (!isValid) {
+          throw new Error("Parameter «path» must start with either «/static» or «/template» to be valid");
+        }
+        const dirpathSanitized = require("path").resolve(__dirname + "/src" + dirpath);
+        await require("fs").promises.rmdir(dirpathSanitized, {
+          recursive: true
+        });
+        return response.success({
+          operation: "api/v1/filesystem/deleteDirectory",
+          output: {
+            deletedDirectory: dirpathSanitized
+          },
+        });
+      } catch (error) {
+        return response.fail(error);
+      }
+    };
+
+    // @file[34] = src/controllers/api/v1/filesystem/readFile.js
+
+    Restomatic.controllers.api.v1.filesystem.readFile = async function(request, response) {
+      try {
+        Restomatic.utils.protectWithAdminToken("api/v1/filesystem/readFile", request.headers.token || request.body?.token || request.query.token || false);
+        const filepath = request.body?.path || request.query.path || false;
+        const isValid = filepath.startsWith("/static") || filepath.startsWith("/template");
+        if (!isValid) {
+          throw new Error("Parameter «path» must start with either «/static» or «/template» to be valid to «readFile»");
+        }
+        const filepathSanitized = require("path").resolve(__dirname + "/src" + filepath);
+        const content = await require("fs").promises.readFile(filepathSanitized, "utf8");
+        return response.success({
+          operation: "api/v1/filesystem/readFile",
+          output: {
+            file: filepathSanitized,
+            content,
+          },
+        });
+      } catch (error) {
+        return response.fail(error);
+      }
+    };
+
+    // @file[35] = src/controllers/api/v1/filesystem/writeFile.js
+
+    Restomatic.controllers.api.v1.filesystem.writeFile = async function(request, response) {
+      try {
+        Restomatic.utils.protectWithAdminToken("api/v1/filesystem/writeFile", request.headers.token || request.body?.token || request.query.token || false);
+        const filepath = request.body?.path || request.query.path || false;
+        const isValid = filepath.startsWith("/static") || filepath.startsWith("/template");
+        if (!isValid) {
+          throw new Error("Parameter «path» must start with either «/static» or «/template» to be valid to «writeFile»");
+        }
+        const content = request.body?.content || request.query.content || false;
+        const filepathSanitized = require("path").resolve(__dirname + "/src" + filepath);
+        await require("fs").promises.writeFile(filepathSanitized, content, "utf8");
+        return response.success({
+          operation: "api/v1/filesystem/writeFile",
+          output: {
+            file: filepathSanitized,
+            written: true,
+          },
+        });
+      } catch (error) {
+        return response.fail(error);
+      }
+    };
+
+    // @file[36] = src/controllers/api/v1/filesystem/deleteFile.js
+
+    Restomatic.controllers.api.v1.filesystem.deleteFile = async function(request, response) {
+      try {
+        Restomatic.utils.protectWithAdminToken("api/v1/filesystem/deleteFile", request.headers.token || request.body?.token || request.query.token || false);
+        const filepath = request.body?.path || request.query.path || false;
+        const isValid = filepath.startsWith("/static") || filepath.startsWith("/template");
+        if (!isValid) {
+          throw new Error("Parameter «path» must start with either «/static» or «/template» to be valid to «deleteFile»");
+        }
+        const filepathSanitized = require("path").resolve(__dirname + "/src" + filepath);
+        await require("fs").promises.unlink(filepathSanitized);
+        return response.success({
+          operation: "api/v1/filesystem/deleteFile",
+          output: {
+            deletedFile: filepathSanitized
+          },
+        });
+      } catch (error) {
+        return response.fail(error);
+      }
+    };
+
+    // @file[37] = src/controllers/api/v1/filesystem/isFile.js
+
+    Restomatic.controllers.api.v1.filesystem.isFile = async function(request, response) {
+      try {
+        Restomatic.utils.protectWithAdminToken("api/v1/filesystem/isFile", request.headers.token || request.body?.token || request.query.token || false);
+        const filepath = request.body?.path || request.query.path || false;
+        const isValid = filepath.startsWith("/static") || filepath.startsWith("/template");
+        if (!isValid) {
+          throw new Error("Parameter «path» must start with either «/static» or «/template» to be valid to «isFile»");
+        }
+        const filepathSanitized = require("path").resolve(__dirname + "/src" + filepath);
+        const stats = await require("fs").promises.lstat(filepathSanitized);
+        return response.success({
+          operation: "api/v1/filesystem/isFile",
+          output: {
+            path: filepath,
+            isFile: stats.isFile()
+          },
+        });
+      } catch (error) {
+        return response.fail(error);
+      }
+    };
+
+    // @file[38] = src/main/002.get-parameters.js
 
     // Get parameters
     Restomatic.parameters = options;
 
-    // @file[32] = src/main/003.create-database.js
+    // @file[39] = src/main/003.create-database.js
 
     // Create database
     Create_database: {
@@ -642,7 +810,7 @@ const RestomaticAPI = {
 
     }
 
-    // @file[33] = src/main/004.create-application.js
+    // @file[40] = src/main/004.create-application.js
 
     // Create application
     Create_application: {
@@ -673,7 +841,7 @@ const RestomaticAPI = {
 
     }
 
-    // @file[34] = src/main/005.create-server.js
+    // @file[41] = src/main/005.create-server.js
 
     // Create server
     Create_server: {
@@ -684,7 +852,7 @@ const RestomaticAPI = {
 
     }
 
-    // @file[35] = src/main/010.add-rest-routes.js
+    // @file[42] = src/main/010.add-rest-routes.js
 
     // Add rest routes
     Add_rest_routes: {
@@ -702,6 +870,14 @@ const RestomaticAPI = {
       Restomatic.router.use("/api/v1/data/removeColumn", Restomatic.controllers.api.v1.data.removeColumn);
       Restomatic.router.use("/api/v1/data/listFiles", Restomatic.controllers.api.v1.data.listFiles);
       Restomatic.router.post("/api/v1/data/setFile", Restomatic.controllers.api.v1.data.setFile);
+
+      Restomatic.router.use("/api/v1/filesystem/readDirectory", Restomatic.controllers.api.v1.filesystem.readDirectory);
+      Restomatic.router.use("/api/v1/filesystem/makeDirectory", Restomatic.controllers.api.v1.filesystem.makeDirectory);
+      Restomatic.router.use("/api/v1/filesystem/deleteDirectory", Restomatic.controllers.api.v1.filesystem.deleteDirectory);
+      Restomatic.router.use("/api/v1/filesystem/readFile", Restomatic.controllers.api.v1.filesystem.readFile);
+      Restomatic.router.use("/api/v1/filesystem/writeFile", Restomatic.controllers.api.v1.filesystem.writeFile);
+      Restomatic.router.use("/api/v1/filesystem/deleteFile", Restomatic.controllers.api.v1.filesystem.deleteFile);
+      Restomatic.router.use("/api/v1/filesystem/isFile", Restomatic.controllers.api.v1.filesystem.isFile);
 
       // Inject routes to override other routes:
       if (typeof Restomatic.parameters.routesCallback === "function") {
@@ -736,7 +912,7 @@ const RestomaticAPI = {
 
     }
 
-    // @file[36] = src/main/011.add-rest-models.js
+    // @file[43] = src/main/011.add-rest-models.js
 
     // Add rest models
     Add_rest_models: {
@@ -772,7 +948,7 @@ const RestomaticAPI = {
 
     }
 
-    // @file[37] = src/main/900.start-server.js
+    // @file[44] = src/main/900.start-server.js
 
     // Start server
     Start_server: {
@@ -784,7 +960,7 @@ const RestomaticAPI = {
 
     }
 
-    // @file[38] = src/main/999.close-function.js
+    // @file[45] = src/main/999.close-function.js
 
     return Restomatic;
   }

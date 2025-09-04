@@ -24,6 +24,14 @@ npm i -g @carlosjimenohernandez/restomatic
    - to load js, css, images, etc.
 - Dynamic templates: `/template/...`
    - to load custom [`ejs`](https://github.com/mde/ejs)-rendered content.
+- Filesystem operations:
+   - readDirectory: at `/api/v1/filesystem/readDirectory?token=admin`
+   - makeDirectory: at `/api/v1/filesystem/makeDirectory?token=admin`
+   - deleteDirectory: at `/api/v1/filesystem/deleteDirectory?token=admin`
+   - readFile: at `/api/v1/filesystem/readFile?token=admin`
+   - writeFile: at `/api/v1/filesystem/writeFile?token=admin`
+   - deleteFile: at `/api/v1/filesystem/deleteFile?token=admin`
+   - isFile: at `/api/v1/filesystem/isFile?token=admin`
 
 ## Dependencies
 
@@ -68,20 +76,6 @@ From a node.js script you can:
 
 ```js
 const restomaticInstance = await require("@carlosjimenohernandez/restomatic").create({
-    port: "9090",
-    models: "models.js",
-    routes: "routes.js",
-    token: "admin",
-    database: "test.sqlite",
-});
-```
-
-You can also import it:
-
-```js
-import Restomatic from "@carlosjimenohernandez/restomatic";
-
-const restomaticInstance = await Restomatic.create({
     port: "9090",
     models: "models.js",
     routes: "routes.js",
@@ -158,6 +152,7 @@ And a REST is set up for you automatically.
 
 The following titles describe the common operations enabled by default on `/api/v1/data/{operation}` path of the application.
 
+  - **Schema** at `/api/v1/data/schema`
   - **Select data** at `/api/v1/data/select`
      - Parameter `from`: **String**
         - with the name of the table
@@ -215,6 +210,24 @@ Also, you can alter the schema by the following operations:
      - This operation requires `multipart/form-data` (see [`test/run.js`](./test/run.js))
      - Parameter `file`: **Blob**
         - with the contents of the file
+
+Also, you can access and modify the filesystem (only `/static` and `/template` folders) by the following operations:
+
+  - **Read file** at `/api/v1/filesystem/readFile`
+     - Parameter `path`: **String**
+  - **Write file** at `/api/v1/filesystem/writeFile`
+     - Parameter `path`: **String**
+     - Parameter `content`: **String**
+  - **Delete file** at `/api/v1/filesystem/deleteFile`
+     - Parameter `path`: **String**
+  - **Read directory** at `/api/v1/filesystem/readDirectory`
+     - Parameter `path`: **String**
+  - **Make directory** at `/api/v1/filesystem/makeDirectory`
+     - Parameter `path`: **String**
+  - **Delete directory** at `/api/v1/filesystem/deleteDirectory`
+     - Parameter `path`: **String**
+  - **Is file** at `/api/v1/filesystem/isFile`
+     - Parameter `path`: **String**
 
 ### Select data
 
@@ -467,3 +480,25 @@ const response = await r.text();
 
 console.log(response);
 ```
+
+### Filesystem operations
+
+Only admin can access and modify files through the filesystem API, as it is a potentially conflictive behaviour.
+
+The above operations describe an example of every possible **Filesystem API** operation:
+
+- http://127.0.0.1:9090/api/v1/filesystem/makeDirectory?token=admin&path=/static/newdir
+- http://127.0.0.1:9090/api/v1/filesystem/readDirectory?token=admin&path=/static
+- http://127.0.0.1:9090/api/v1/filesystem/deleteDirectory?token=admin&path=/static/newdir
+- http://127.0.0.1:9090/api/v1/filesystem/writeFile?token=admin&path=/static/newdir/file1.txt&content=Hello!
+- http://127.0.0.1:9090/api/v1/filesystem/readFile?token=admin&path=/static/newdir/file1.txt
+- http://127.0.0.1:9090/api/v1/filesystem/deleteFile?token=admin&path=/static/newdir/file1.txt
+- http://127.0.0.1:9090/api/v1/filesystem/isFile?token=admin&path=/static/jquery.js
+
+## Customize by your own
+
+The `npm run build` command takes `bundlelist.js` exported files and dumps them in a all-in-one file called `restomatic.js`.
+
+By this reason, all the files have its `__dirname` pointing on top of the project.
+
+Use it at your own convenience, the final file is quite short.

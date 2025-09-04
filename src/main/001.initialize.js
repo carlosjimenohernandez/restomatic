@@ -6,7 +6,10 @@ const Restomatic = {
       v1: {
         data: {
           // @OK
-        }
+        },
+        filesystem: {
+          // @OK
+        },
       }
     }
   },

@@ -17,7 +17,7 @@
     storage,
     fileFilter: function(request, file, done) {
       try {
-        Restomatic.utils.protectWithAdminToken("setFile", request.headers.token || request.body?.token || request.query.token || false);
+        Restomatic.utils.protectWithAdminToken("api/v1/data/setFile", request.headers.token || request.body?.token || request.query.token || false);
         done(null, true);
       } catch (error) {
         done(error, false);

@@ -1,6 +1,6 @@
 Restomatic.controllers.api.v1.data.createColumn = async function(request, response) {
   try {
-    Restomatic.utils.protectWithAdminToken("createColumn", request.headers.token || request.body?.token || request.query.token || false);
+    Restomatic.utils.protectWithAdminToken("api/v1/data/createColumn", request.headers.token || request.body?.token || request.query.token || false);
     const table = request.body?.table || request.query.table || false;
     const column = request.body?.column || request.query.column || false;
     const content = request.body?.content || request.query.content || false;
